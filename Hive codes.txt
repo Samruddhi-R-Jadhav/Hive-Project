@@ -1,0 +1,63 @@
+#Facebook data
+
+#1)Creating table fb11
+create table fb11 (id INT,tenure INT,friends INT,groups INT,likes INT,shares INT) row format delimited fields terminated by ',';
+load data local inpath '/home/cloudera/Downloads/fb1.csv' overwrite into table fb11;
+select * from fb11;
+
+#2)Creating table fb22
+create table fb22 (userid INT,age INT,day INT,year INT,month INT,sex STRING) row format delimited fields terminated by ',';
+load data local inpath '/home/cloudera/Downloads/fb2.csv' overwrite into table fb22;
+select * from fb22;
+
+#3) Inner Join
+select fb11.id,fb11.tenure,fb11.friends,fb11.groups,fb11.likes,fb11.shares,fb22.age, fb22.day,fb22.year,fb22.month,fb22.sex
+from fb11 inner join fb22 ON (fb11.id=fb22.userid);
+
+#4) Renaming inner join table as "fbinner"
+create table fbinner as 
+select fb11.id,fb11.tenure,fb11.friends,fb11.groups,fb11.likes,fb11.shares,fb22.age, fb22.day,fb22.year,fb22.month,fb22.sex
+from fb11 inner join fb22 ON (fb11.id=fb22.userid);
+
+#5)  Gender wise minimum age
+select sex, min(age) from fbinner group by sex;
+
+#6) Gender wise maximum age
+select sex, max(age) from fbinner group by sex;
+
+#7) Sorting by age
+Select id,year,age,sex from fbinner order by age;
+
+#8) Renaming 'fbinner' to 'fbfinal'
+alter table fbinner rename to fbfinal
+
+#9) Average tenure year wise for females
+Select year,avg(tenure) from fbfinal where sex=‘female’ group by year;
+
+#10) Average tenure year wise for males
+select sex, avg(tenure) from fbfinal where sex="male" group by year;
+
+#11) Creating fb_view
+create view fb_view as select id,age,sex,year from fbfinal where year=1999;
+
+#12) Viewing fb_view 
+select * from fb_view
+
+#13) Dropping fb_view
+drop view fb_view
+
+#14) Sex wise average age 
+select sex, avg(age) from fbfinal group by sex
+
+#15) Outer join
+select fb11.id,fb11.tenure,fb11.friends,fb11.groups,fb11.likes,fb11.shares,fb22.age, fb22.day,fb22.year,fb22.month,fb22.sex
+from fb11 full outer join fb22 on (fb11.id = fb22.userid);
+
+#16) Left join
+select fb11.id,fb11.tenure,fb11.friends,fb11.groups,fb11.likes,fb11.shares, fb22.age,fb22.day,fb22.year,fb22.month,fb22.sex 
+from fb11 left join fb22 ON (fb11.id=fb22.userid);
+
+#17) Right join
+select fb11.id,fb11.tenure,fb11.friends,fb11.groups,fb11.likes,fb11.shares, fb22.age,fb22.day,fb22.year,fb22.month,fb22.sex 
+from fb11 right join fb22 ON (fb11.id=fb22.userid);
+
